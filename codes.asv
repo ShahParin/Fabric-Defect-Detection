@@ -12,14 +12,9 @@ for i=1:c:a-4
     for j=1:d:b-4
         C=img1((i:i+4),(j:j+4));
         h(:,:,l) = C;
-        temp = zeros(5,5);
-        for k=1:5
-            for l1=1:5
-                temp(k,l1) = h(k,l1,l);
-            end
-        end
+        for k=1
+        hom(l,1) = graycoprops(graycomatrix(h(:,:,l)), 'Homogeneity');
         l=l+1;
     end
 end
-imshow(uint8(h(:,:,1)));
 homogeneity = graycoprops(graycomatrix(img), 'Homogeneity');
