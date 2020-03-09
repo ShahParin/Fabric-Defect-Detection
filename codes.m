@@ -1,6 +1,6 @@
 clc;
 clear all;
-img = imread('images/Fabric2.JPG');
+img = imread('images/Fabric22.jpg');
 img = rgb2gray(img);
 figure(1);
 imshow(img);
@@ -30,14 +30,15 @@ homogeneity = graycoprops(graycomatrix(img), 'Homogeneity');
 
 % histogram eq.
 figure(3);
-imhist(img,256);
+imhist(img1,256);
 % imshow(hi);
 title('imhist');
 
 figure(4);
-histeq(img,256);
+histeq(img1,256);
 % imshow(he);
 title('histeq');
+% img1 = histeq(img1);
 
 % transform curve
 figure(5);
@@ -45,19 +46,55 @@ figure(5);
 plot((0:255)/255,T);
 title('transform curve');
 
-% otsu algo
-figure(6);
-level = graythresh(img1);
-BW = imbinarize(img1,level);
-imshowpair(img1,BW,'montage');
-title('otsu');
+% % otsu algo
+% figure(6);
+% level = graythresh(img1);
+% BW = imbinarize(img1,level);
+% imshowpair(img1,BW,'montage');
+% title('otsu');
 
-%open-close
+% open-close
 figure(7);
 se = strel('square',1);
-op = imopen(img1,se);
-cl = imclose(img1,se);
+op = imerode(double(img1),se);
+cl = imclose(double(img1),se);
 subplot(1,2,1);
-imshow(op);
+imshow(uint8(op));
 subplot(1,2,2);
-imshow(cl);
+imshow(uint8(img1));
+
+% local threshold
+filt = zeros(a,b);
+for i = 1:3
+    for j = 1:3
+        filt(i,j) = 1;
+    end
+end
+filt(2,2) = -8;
+opt = zeros(a,b);
+for i=2:a
+    for j=2:b
+        if j==1||j==b||i==1||i==a
+            opt(i,j) = img1(i,j);
+        else
+            opt(i,j) = filt(1,1)*img1(i-1,j-1) + filt(1,2)*img1(i-1,j) + filt(1,3)*img1(i-1,j+1) + filt(2,1)*img1(i,j-1) + filt(2,2)*img1(i,j) + filt(2,3)*img1(i,j+1) + filt(3,1)*img1(i+1,j-1) + filt(3,2)*img1(i+1,j) + filt(3,3)*img1(i+1,j+1);
+        end
+    end
+end
+figure(8);
+imshow(uint8(opt));
+
+% global threshold
+for i=1:a
+    for j=1:b
+        t = img1(i,j);
+        if t<70
+            img1(i,j) = 0;
+        else
+            img1(i,j) = 256;
+        end
+    end
+end
+figure(9);
+imshow(uint8(img1));
+title('local');
